@@ -4,52 +4,45 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import Form from "@components/FormTransition";
+import Form from "@components/FormSuggestion";
 import { toast } from "react-toastify";
 
-const CreateTransition = () => {
+const CreateSuggestion = () => {
   const router = useRouter();
   const { data: session } = useSession();
 
   const [submitting, setSubmitting] = useState(false);
   const [post, setPost] = useState({
     description: "",
-    tag: "",
-    value: "",
-    type: "",
-    date: "",
+    status: "Pending",
   });
 
-  const createTransition = async (e) => {
+  const CreateSuggestion = async (e) => {
     e.preventDefault();
 
     setSubmitting(true);
 
     try {
-      const response = await fetch("/api/transition/new", {
+      const response = await fetch("/api/suggestion/new", {
         method: "POST",
         body: JSON.stringify({
           description: post.description,
           userId: session?.user.id,
-          value: post.value,
-          tag: post.tag,
-          type: post.type,
-          date: post.date,
         }),
       });
 
       if (response.ok) {
-        toast.success("Transition created successfully", {
+        toast.success("Suggestion created successfully", {
           onClose: () => {
-            router.push("/");
+            router.push("/suggestion");
           },
         });
       }
     } catch (error) {
       console.log(error);
-      toast.error("Error creating transaction", {
+      toast.error("Error creating suggestion", {
         onClose: () => {
-          router.push("/transition/new");
+          router.push("/suggestion/new");
         },
       });
     } finally {
@@ -60,14 +53,14 @@ const CreateTransition = () => {
   return (
     <div>
       <Form
-        type="Create"
+        type="Update"
         post={post}
         setPost={setPost}
         submitting={submitting}
-        handleSubmit={createTransition}
+        handleSubmit={CreateSuggestion}
       />
     </div>
   );
 };
 
-export default CreateTransition;
+export default CreateSuggestion;

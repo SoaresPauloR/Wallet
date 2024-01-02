@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import Form from "@components/FormTransition";
+import Form from "@components/FormSuggestion";
 import { toast } from "react-toastify";
 
-const EditTransition = () => {
+const EditSuggestion = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -17,14 +17,12 @@ const EditTransition = () => {
   const [post, setPost] = useState({
     id: "",
     description: "",
-    tag: "",
-    value: "",
-    type: "",
+    status: "",
   });
 
   useEffect(() => {
-    const fetchTransition = async () => {
-      const response = await fetch(`/api/transition/${id}`, {
+    const fetchSuggestion = async () => {
+      const response = await fetch(`/api/suggestion/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -32,44 +30,37 @@ const EditTransition = () => {
         },
       });
 
-      const { _id, description, tag, value, type, date } =
-        await response.json();
+      const { _id, description, status } = await response.json();
 
       setPost({
         id: _id,
         description,
-        tag,
-        value: value.$numberDecimal,
-        type,
-        date: date.split("T")[0],
+        status,
       });
     };
 
-    fetchTransition();
+    fetchSuggestion();
   }, []);
 
-  const createTransition = async (e) => {
+  const createSuggestion = async (e) => {
     e.preventDefault();
 
     setSubmitting(true);
 
     try {
-      const response = await fetch(`/api/transition/${post.id}`, {
+      const response = await fetch(`/api/suggestion/${post.id}`, {
         method: "PATCH",
         body: JSON.stringify({
           description: post.description,
           userId: session?.user.id,
-          value: post.value,
-          tag: post.tag,
-          type: post.type,
-          date: post.date,
+          status: post.status,
         }),
       });
 
       if (response.ok) {
-        toast.success("Transition updated successfully", {
+        toast.success("Suggestion updated successfully", {
           onClose: () => {
-            router.push("/");
+            router.push("/suggestion");
           },
         });
       }
@@ -77,7 +68,7 @@ const EditTransition = () => {
       console.log(error);
       toast.error("Error creating transaction", {
         onClose: () => {
-          router.push("/transition/new");
+          router.push("/suggestion/new");
         },
       });
     } finally {
@@ -87,13 +78,13 @@ const EditTransition = () => {
 
   return (
     <Form
-      type="Create"
+      type="Update"
       post={post}
       setPost={setPost}
       submitting={submitting}
-      handleSubmit={createTransition}
+      handleSubmit={createSuggestion}
     />
   );
 };
 
-export default EditTransition;
+export default EditSuggestion;

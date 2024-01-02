@@ -13,6 +13,10 @@ const UserSchema = new Schema({
   image: {
     type: String,
   },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
 });
 
 const User = models.User || model("User", UserSchema);
